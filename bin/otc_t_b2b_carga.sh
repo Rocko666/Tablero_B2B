@@ -1,3 +1,4 @@
+set -e
 #!/bin/bash
 #############################################################################
 # Proyecto:          Tablas finales tablero B2B                				#
@@ -9,13 +10,16 @@
 # Fecha de modificacion:  2023/03/29                            			#
 # User modificacion: Klever Amari                               			#
 # Descripcion de modificacion: Se actualiza la sentencia hive por beeline   #
-#############################################################################
-set -e
+#########################################################################################################
+# MODIFICACIONES																						#
+# FECHA  		AUTOR     			DESCRIPCION MOTIVO												    #
+# 2023-10-26	CRISTIAN ORTIZ		Migracion beeline->spark BIGD-368									#
+#########################################################################################################
 
 FECHAEJE=$1 # Formato yyyyMMdd
 
-ENTIDAD=OTC_T_B2B_PARQUE_FACTURACION
-AMBIENTE=1 # AMBIENTE (1=produccion, 0=desarrollo)
+ENTIDAD=D_OTC_T_B2B_PARQUE_FACTURACION
+AMBIENTE=0 # AMBIENTE (1=produccion, 0=desarrollo)
 ini_fecha=$(date '+%Y%m%d%H%M%S')
 eval year=$(echo $FECHAEJE | cut -c1-4)
 eval month=$(echo $FECHAEJE | cut -c5-6)
@@ -29,14 +33,15 @@ MesVeinteCuatro=$(date -d "$fechaFinMesAnterior-24 month" +%Y%m%d)
 MesVeinteCuatroDate=$(date -d "$fechaFinMesAnterior-24 month" +%Y-%m-%d)
 MesTres=$(date -d "$fechaIniMes-3 month" +%Y%m%d)
 
-# PARAMETROS DEFINIDOS EN LA TABLA params
-VAL_CADENA_JDBC=$(mysql -N <<<"select valor from params where ENTIDAD = 'PARAM_BEELINE' AND parametro = 'VAL_CADENA_JDBC';")
-VAL_USER=$(mysql -N <<<"select valor from params where ENTIDAD = 'PARAM_BEELINE' AND parametro = 'VAL_USER';")
-VAL_COLA_EJECUCION=$(mysql -N <<<"select valor from params where ENTIDAD = 'PARAM_BEELINE' AND parametro = 'VAL_COLA_EJECUCION';")
-RUTA=$(mysql -N <<<"select valor from params where entidad = '"$ENTIDAD"' and ambiente='"$AMBIENTE"' AND parametro = 'RUTA';")
-ESQUEMA=$(mysql -N <<<"select valor from params where entidad = '"$ENTIDAD"' and ambiente='"$AMBIENTE"' AND parametro = 'ESQUEMA';")
-COLA_HIVE=$(mysql -N <<<"select valor from params where entidad = '"$ENTIDAD"' and ambiente='"$AMBIENTE"' AND parametro = 'COLA_HIVE';")
-VAL_KINIT=$(mysql -N <<<"select valor from params where ENTIDAD = 'SPARK_GENERICO' AND parametro = 'VAL_KINIT';")
+# PARAMETROS DEFINIDOS EN LA TABLA params_des
+VAL_CADENA_JDBC='jdbc:hive2://quisrvbigdata1.otecel.com.ec:2181,quisrvbigdata2.otecel.com.ec:2181,quisrvbigdata10.otecel.com.ec:2181,quisrvbigdata11.otecel.com.ec:2181/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2?tez.queue.name=default'
+
+VAL_USER='rgenerator'
+VAL_COLA_EJECUCION=$(mysql -N <<<"select valor from params_des where ENTIDAD = 'D_PARAM_BEELINE' AND parametro = 'VAL_COLA_EJECUCION';")
+RUTA=$(mysql -N <<<"select valor from params_des where entidad = '"$ENTIDAD"' and ambiente='"$AMBIENTE"' AND parametro = 'RUTA';")
+ESQUEMA=$(mysql -N <<<"select valor from params_des where entidad = '"$ENTIDAD"' and ambiente='"$AMBIENTE"' AND parametro = 'ESQUEMA';")
+COLA_HIVE=$(mysql -N <<<"select valor from params_des where entidad = '"$ENTIDAD"' and ambiente='"$AMBIENTE"' AND parametro = 'COLA_HIVE';")
+VAL_KINIT=$(mysql -N <<<"select valor from params_des where ENTIDAD = 'D_SPARK_GENERICO' AND parametro = 'VAL_KINIT';")
 $VAL_KINIT
 
 log_Extraccion=$RUTA/logs/carga_informacion_b2b_$ini_fecha.log
