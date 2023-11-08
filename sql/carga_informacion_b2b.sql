@@ -186,7 +186,7 @@ WHERE
 --N03
 -----------------TERMINALES 24 MESES 
 truncate TABLE ${hiveconf:ESQUEMAHIVE}.otc_t_b2b_terminales_adendum;
---n01
+
 INSERT
 	INTO
 	${hiveconf:ESQUEMAHIVE}.otc_t_b2b_terminales_adendum PARTITION(fecha_proceso = ${hiveconf:Fecha_Proceso})
@@ -232,6 +232,7 @@ FROM
 WHERE
 	a.rank_alias = 1;
 
+--N04
 INSERT
 	INTO
 	${hiveconf:ESQUEMAHIVE}.otc_t_b2b_terminales_adendum PARTITION(fecha_proceso = ${hiveconf:Fecha_Proceso})
@@ -280,7 +281,7 @@ DROP TABLE ${hiveconf:ESQUEMAHIVE}.otc_t_b2b_temp_factura_afectada;
 DROP TABLE ${hiveconf:ESQUEMAHIVE}.otc_t_b2b_temp_ajustes_nota_credito;
 
 DROP TABLE ${hiveconf:ESQUEMAHIVE}.otc_t_b2b_temp_disputa;
---N04
+--N05
 --EXTRAER NOTAS DE CREDITO BILL SEG
 CREATE TABLE ${hiveconf:ESQUEMAHIVE}.otc_t_b2b_temp_notas_credito AS
 SELECT
@@ -299,7 +300,7 @@ WHERE
 	AND A.bill_status IN (1, 28)
 	AND A.bill_dtm >'${hiveconf:MesVeinteCuatroDate}';
 
---N05
+--N06
 --EXTRAER LA FACTURA AFECTADA CON LA NOTA DE CREDITO
 CREATE TABLE ${hiveconf:ESQUEMAHIVE}.otc_t_b2b_temp_factura_afectada AS
 SELECT
@@ -318,7 +319,7 @@ GROUP BY
 	A.bill_seq,
 	B.num_factura_afectada;
 
---N06 
+--N07
 --EXTRAER AJUSTES EFECTUADOS A LA NOTA DE CREDITO
 CREATE TABLE ${hiveconf:ESQUEMAHIVE}.otc_t_b2b_temp_ajustes_nota_credito AS
 SELECT
@@ -332,7 +333,7 @@ INNER JOIN ${hiveconf:ESQUEMAHIVE}.otc_t_b2b_temp_notas_credito A ON
 WHERE
 	C.adjustment_dat>'${hiveconf:MesVeinteCuatroDate}';
 
---N07 
+--N08
 --EXTRAE DISPUTA DE LA FACTURA AFECTADA POR LA NOTA DE CREDITO
 
 CREATE TABLE ${hiveconf:ESQUEMAHIVE}.otc_t_b2b_temp_disputa AS
@@ -350,7 +351,7 @@ INNER JOIN ${hiveconf:ESQUEMAHIVE}.otc_t_b2b_temp_ajustes_nota_credito F ON
 	G.cuenta_facturacion = F.cuenta_facturacion
 	AND D.DISPUTE_SEQ = F.dispute_seq;
 
---N08
+--N09
 ----------------------------------------------------
 ---Extraer facturaciOn de tres meses posteriores incluyendo mes actual y alimentar tabla de fecturacion otc_t_b2b_facturacion
 
