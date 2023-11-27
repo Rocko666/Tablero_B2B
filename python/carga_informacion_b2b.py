@@ -138,7 +138,11 @@ try:
     query_truncate = "TRUNCATE TABLE "+vSchmRep+"."+"otc_t_b2b_terminales_adendum"
     print(query_truncate)
     spark.sql(query_truncate)
-    VSQL=insert_01_otc_t_b2b_terminales_adendum(vSchmRep,mesVeinteCuatro,FechaProceso)
+    VSQL_1=otc_t_b2b_identificacion_cliente(vSchmRep)
+    df03_01 = spark.sql(VSQL_1).cache()
+    df03_01.printSchema()
+    df03_01.createOrReplaceTempView("otc_t_b2b_identificacion_cliente")
+    VSQL=insert_01_otc_t_b2b_terminales_adendum(mesVeinteCuatro,FechaProceso)
     print(etq_sql(VSQL))
     df03 = spark.sql(VSQL).cache()
     ts_step_count = datetime.now()
@@ -165,6 +169,7 @@ try:
         except Exception as e:       
             exit(etq_error(msg_e_insert_hive('insert_01_otc_t_b2b_terminales_adendum',str(e))))
     del df03
+    del df03_01
     print(etq_info("Eliminar dataframe [{}]".format('df03')))
     te_step = datetime.now()
     print(etq_info(msg_d_duracion_ejecucion(vStp,vle_duracion(ts_step,te_step))))
@@ -177,7 +182,7 @@ try:
     ts_step = datetime.now()
     print(etq_info(vStp))
     print(lne_dvs())
-    VSQL=insert_02_otc_t_b2b_terminales_adendum(vSchmRep,mesVeinteCuatro,FechaProceso)
+    VSQL=insert_02_otc_t_b2b_terminales_adendum(mesVeinteCuatro,FechaProceso)
     print(etq_sql(VSQL))
     df04 = spark.sql(VSQL).cache()
     ts_step_count = datetime.now()
@@ -201,6 +206,7 @@ try:
             print(etq_info(msg_t_total_registros_hive('insert_02_otc_t_b2b_terminales_adendum',str(vTotDf))))
             te_step_tbl = datetime.now()
             print(etq_info(msg_d_duracion_hive('insert_02_otc_t_b2b_terminales_adendum',vle_duracion(ts_step_tbl,te_step_tbl))))
+            spark.catalog.dropTempView("otc_t_b2b_identificacion_cliente")
         except Exception as e:       
             exit(etq_error(msg_e_insert_hive('insert_02_otc_t_b2b_terminales_adendum',str(e))))
     del df04

@@ -107,9 +107,19 @@ def insert_otc_t_b2b_parque_facturacion():
     """
     return qry
 
+## N03_1 - Extraccion diferentes DOCUMENTOS DE IDENTIFICACION del parque facturacion
+def otc_t_b2b_identificacion_cliente(vSchmRep):
+    qry="""
+SELECT
+	DISTINCT identificacion_cliente
+FROM
+	{vSchmRep}.otc_t_b2b_parque_facturacion
+    """.format(vSchmRep)
+    return qry
+
 ## N03 --TERMINALES 24 MESES 
 # trunca/carga 
-def insert_01_otc_t_b2b_terminales_adendum(vSchmRep,mesVeinteCuatro,FechaProceso):
+def insert_01_otc_t_b2b_terminales_adendum(mesVeinteCuatro,FechaProceso):
     qry="""
 SELECT
 	marca
@@ -144,11 +154,8 @@ FROM
 		fecha_factura DESC ) AS rank_alias
 	FROM
 		db_cs_terminales.otc_t_terminales_simcards T
-	INNER JOIN (
-		SELECT
-			DISTINCT identificacion_cliente
-		FROM
-			{vSchmRep}.otc_t_b2b_parque_facturacion) PF ON
+	INNER JOIN otc_t_b2b_identificacion_cliente PF 
+	ON
 		PF.identificacion_cliente = T.identificacion_cliente
 	LEFT JOIN db_urm.d_tacs M ON
 		M.tac = substring(T.imei, 1, 8)
@@ -162,11 +169,11 @@ FROM
 			AND p_fecha_factura>{mesVeinteCuatro} ) a
 WHERE
 	a.rank_alias = 1
-    """.format(vSchmRep=vSchmRep,mesVeinteCuatro=mesVeinteCuatro,FechaProceso=FechaProceso)
+    """.format(mesVeinteCuatro=mesVeinteCuatro,FechaProceso=FechaProceso)
     return qry
 
 ## N04
-def insert_02_otc_t_b2b_terminales_adendum(vSchmRep,mesVeinteCuatro,FechaProceso):
+def insert_02_otc_t_b2b_terminales_adendum(mesVeinteCuatro,FechaProceso):
     qry="""
 SELECT
 	CASE
@@ -188,11 +195,8 @@ ORDER BY
 	, {FechaProceso} as fecha_proceso
 FROM
 	db_cs_terminales.otc_t_terminales_simcards T
-INNER JOIN (
-	SELECT
-		DISTINCT identificacion_cliente
-	FROM
-		{vSchmRep}.otc_t_b2b_parque_facturacion) PF ON
+INNER JOIN otc_t_b2b_identificacion_cliente PF 
+	ON
 	PF.identificacion_cliente = T.identificacion_cliente
 LEFT JOIN db_urm.d_tacs M ON
 	M.tac = substring(T.imei, 1, 8)
@@ -205,7 +209,7 @@ WHERE
 	AND tipo_cargo = 'CARGO'
 	AND T.telefono IS NULL
 	AND p_fecha_factura>{mesVeinteCuatro}
-    """.format(vSchmRep=vSchmRep,mesVeinteCuatro=mesVeinteCuatro,FechaProceso=FechaProceso)
+    """.format(mesVeinteCuatro=mesVeinteCuatro,FechaProceso=FechaProceso)
     return qry
 
 ## N05 --EXTRAER NOTAS DE CREDITO BILL SEG
