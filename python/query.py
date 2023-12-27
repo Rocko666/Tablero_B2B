@@ -114,7 +114,7 @@ SELECT
 	DISTINCT identificacion_cliente
 FROM
 	{vSchmRep}.otc_t_b2b_parque_facturacion
-    """.format(vSchmRep)
+    """.format(vSchmRep=vSchmRep)
     return qry
 
 ## N03 --TERMINALES 24 MESES 
@@ -310,6 +310,7 @@ SELECT
 FROM
 	{vSchmRep}.otc_t_b2b_parque_facturacion
     """.format(vSchmRep=vSchmRep)
+    print(qry)
     return qry  
 
 ## N10 --Extrae informacion de disputa
@@ -326,6 +327,7 @@ SELECT
 FROM
 	otc_t_b2b_temp_disputa 
     """
+    print(qry)
     return qry  
 
 ## N11 --Extraer facturacion de tres meses posteriores incluyendo mes actual y alimentar tabla de facturacion otc_t_b2b_facturacion
@@ -337,11 +339,10 @@ SELECT
 	CF.telefono,
 	CF.numero_factura,
 	'FACTURA' tipo_documento,
-	to_date(FROM_UNIXTIME(UNIX_TIMESTAMP(CAST(CF.fecha_factura AS String),
-	'yyyyMMdd'))) fecha_transaccion,
+	to_date(FROM_UNIXTIME(UNIX_TIMESTAMP(CAST(CF.fecha_factura AS String),'yyyyMMdd'))) fecha_transaccion,
 	'' disputa,
 	'' usuario,
-	sum(CF.valor_facturado)monto,
+	sum(CF.valor_facturado) as monto,
 	{FechaProceso} AS fecha_proceso
 FROM
 	db_cs_facturacion.otc_t_c_semantica_fact CF
@@ -359,6 +360,7 @@ GROUP BY
 	CF.numero_factura,
 	CF.fecha_factura
     """.format(mesVeinteCuatro=mesVeinteCuatro,FechaProceso=FechaProceso)
+    print(qry)
     return qry  
 
 ## N12 --Extraer facturacion de tres meses posteriores incluyendo mes actual y alimentar tabla de facturacion otc_t_b2b_facturacion
@@ -370,8 +372,7 @@ SELECT
 	CF.telefono,
 	CF.numero_factura,
 	'NOTA DE CREDITO' tipo_documento,
-	to_date(FROM_UNIXTIME(UNIX_TIMESTAMP(CAST(CF.fecha_factura AS String),
-	'yyyyMMdd'))) fecha_transaccion,
+	to_date(FROM_UNIXTIME(UNIX_TIMESTAMP(CAST(CF.fecha_factura AS String),'yyyyMMdd'))) fecha_transaccion,
 	D.dispute_type_name disputa,
 	'' usuario,
 	sum(CF.valor_facturado)monto,
@@ -400,5 +401,6 @@ GROUP BY
 	CF.fecha_factura,
 	D.dispute_type_name
     """.format(mesVeinteCuatro=mesVeinteCuatro,FechaProceso=FechaProceso)
+    print(qry)
     return qry  
 

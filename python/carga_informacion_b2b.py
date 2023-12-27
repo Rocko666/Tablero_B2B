@@ -147,30 +147,12 @@ try:
     df03 = spark.sql(VSQL).cache()
     ts_step_count = datetime.now()
     vTotDf=df03.count()
+    print(etq_info(msg_t_total_registros_hive('insert_01_otc_t_b2b_terminales_adendum',str(vTotDf))))
     te_step_count = datetime.now()
     print(etq_info(msg_d_duracion_ejecucion('df03',vle_duracion(ts_step_count,te_step_count))))
-    if df03.rdd.isEmpty():
-        exit(etq_nodata(msg_e_df_nodata('df03')))
-    else:
-        try:
-            ts_step_tbl = datetime.now()
-            print(etq_info(msg_i_insert_hive('insert_01_otc_t_b2b_terminales_adendum')))
-            columns = spark.table(vSchmRep+"."+"otc_t_b2b_terminales_adendum").columns
-            cols = []
-            for column in columns:
-                cols.append(column)
-            df03 = df03.select(cols)
-            df03.repartition(1).write.mode("append").insertInto(vSchmRep+"."+"otc_t_b2b_terminales_adendum")
-            print(etq_info("Insercion Ok de la tabla destino: "+"otc_t_b2b_terminales_adendum")) 
-            df03.printSchema()
-            print(etq_info(msg_t_total_registros_hive('insert_01_otc_t_b2b_terminales_adendum',str(vTotDf))))
-            te_step_tbl = datetime.now()
-            print(etq_info(msg_d_duracion_hive('insert_01_otc_t_b2b_terminales_adendum',vle_duracion(ts_step_tbl,te_step_tbl))))
-        except Exception as e:       
-            exit(etq_error(msg_e_insert_hive('insert_01_otc_t_b2b_terminales_adendum',str(e))))
-    del df03
+    
     del df03_01
-    print(etq_info("Eliminar dataframe [{}]".format('df03')))
+    print(etq_info("Eliminar dataframe [{}]".format('df03_01')))
     te_step = datetime.now()
     print(etq_info(msg_d_duracion_ejecucion(vStp,vle_duracion(ts_step,te_step))))
 except Exception as e:
@@ -185,6 +167,7 @@ try:
     VSQL=insert_02_otc_t_b2b_terminales_adendum(mesVeinteCuatro,FechaProceso)
     print(etq_sql(VSQL))
     df04 = spark.sql(VSQL).cache()
+    df04 = df04.union(df03)
     ts_step_count = datetime.now()
     vTotDf=df04.count()
     te_step_count = datetime.now()
@@ -209,6 +192,7 @@ try:
             spark.catalog.dropTempView("otc_t_b2b_identificacion_cliente")
         except Exception as e:       
             exit(etq_error(msg_e_insert_hive('insert_02_otc_t_b2b_terminales_adendum',str(e))))
+    del df03
     del df04
     print(etq_info("Eliminar dataframe [{}]".format('df04')))
     te_step = datetime.now()
