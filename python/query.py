@@ -115,6 +115,7 @@ SELECT
 FROM
 	{vSchmRep}.otc_t_b2b_parque_facturacion
     """.format(vSchmRep=vSchmRep)
+    print(qry)
     return qry
 
 ## N03 --TERMINALES 24 MESES 

@@ -1,13 +1,27 @@
-
---CREA PARAMETROS PARA LA ENTIDAD D_TESTSQLSERVER EN params_des
-DELETE FROM params_des WHERE ENTIDAD= 'D_TESTSQLSERVER';
-INSERT INTO params_des(ENTIDAD,PARAMETRO,VALOR,ORDEN,AMBIENTE) VALUES('D_TESTSQLSERVER','VAL_RUTA','/home/nae108834/sqlservertest','0','0');
-INSERT INTO params_des(ENTIDAD,PARAMETRO,VALOR,ORDEN,AMBIENTE) VALUES('D_TESTSQLSERVER','VAL_ESQUEMA','db_desarrollo2021','0','0');
-INSERT INTO params_des(ENTIDAD,PARAMETRO,VALOR,ORDEN,AMBIENTE) VALUES('D_TESTSQLSERVER','VAL_TABLA','otc_t_v_sqlservertest','0','0');
-INSERT INTO params_des(ENTIDAD,PARAMETRO,VALOR,ORDEN,AMBIENTE) VALUES('D_TESTSQLSERVER','VAL_DATABASE','telefonica','0','0');
-INSERT INTO params_des(ENTIDAD,PARAMETRO,VALOR,ORDEN,AMBIENTE) VALUES('D_TESTSQLSERVER','VAL_USUARIO','userdas','0','0');
-INSERT INTO params_des(ENTIDAD,PARAMETRO,VALOR,ORDEN,AMBIENTE) VALUES('D_TESTSQLSERVER','VAL_PASSWORD','CM3wm#$9iiHr','0','0');
-INSERT INTO params_des(ENTIDAD,PARAMETRO,VALOR,ORDEN,AMBIENTE) VALUES('D_TESTSQLSERVER','VAL_ESQUEMA_SQLSERVER','dbo','0','0');
-INSERT INTO params_des(ENTIDAD,PARAMETRO,VALOR,ORDEN,AMBIENTE) VALUES('D_TESTSQLSERVER','VAL_TABLA_SQLSERVER','HEC_INTERCONEXION','0','0');
-INSERT INTO params_des(ENTIDAD,PARAMETRO,VALOR,ORDEN,AMBIENTE) VALUES('D_TESTSQLSERVER','VAL_URL','jdbc:sqlserver://10.122.7.242:14335;databaseName=telefonica','0','0');
-SELECT * FROM params_des WHERE ENTIDAD='D_TESTSQLSERVER' ORDER BY PARAMETRO;
+###########################################################################################################################################################
+echo `date '+%Y-%m-%d %H:%M:%S'`" INFO: Parametros definidos en la tabla $TABLA" 2>&1 &>> $VAL_LOG
+###########################################################################################################################################################
+VAL_RUTA_OUT=`mysql -N <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'VAL_RUTA_OUT';"` 
+VAL_HORA_INI_1=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'VAL_HORA_INI_1';"`
+VAL_HORA_FIN_1=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'VAL_HORA_FIN_1';"`
+VAL_HORA_INI_2=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'VAL_HORA_INI_2';"`
+VAL_HORA_FIN_2=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'VAL_HORA_FIN_2';"`
+VAL_HORA_INI_3=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'VAL_HORA_INI_3';"`
+VAL_HORA_FIN_3=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'VAL_HORA_FIN_3';"`
+VAL_TABLA_FINAL=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'VAL_TABLA_FINAL';"`
+VAL_TABLA_TMP=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'VAL_TABLA_TMP';"`
+VAL_TIPO_CARGA=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'VAL_TIPO_CARGA';"`
+VAL_REPARTITION=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'VAL_REPARTITION';"`
+VAL_FETCH_SIZE=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'VAL_FETCH_SIZE';"`
+VAL_MASTER=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'VAL_MASTER';"`
+VAL_DRIVER_MEMORY=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'VAL_DRIVER_MEMORY';"`
+VAL_EXECUTOR_MEMORY=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'VAL_EXECUTOR_MEMORY';"`
+VAL_NUM_EXECUTORS=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'VAL_NUM_EXECUTORS';"`
+VAL_NUM_EXECUTOR_CORES=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'VAL_NUM_EXECUTOR_CORES';"`
+VAL_QUEUE=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'QUEUE';"`
+VAL_CORREO_ASUNTO=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'VAL_CORREO_ASUNTO';"`
+VAL_CORREO_EMISOR=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'VAL_CORREO_EMISOR';"`
+VAL_CORREOS_RECEPTORES=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'VAL_CORREOS_RECEPTORES';"`
+ETAPA=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'ETAPA';"`
+EVENTO=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'EVENTO';"`
+SHELL=`mysql -N  <<<"select valor from $TABLA where ENTIDAD = '"$ENTIDAD"' AND parametro = 'SHELL';"`

@@ -13,10 +13,6 @@ from messages import *
 from functions import *
 from create import *
 
-## STEP 1: Definir variables o constantes
-vLogInfo='INFO:'
-vLogError='ERROR:'
-
 timestart = datetime.now()
 ## STEP 2: Captura de argumentos en la entrada
 parser = argparse.ArgumentParser()
@@ -59,10 +55,7 @@ try:
     VSQL=otc_t_b2b_temp_parque()
     print(etq_sql(VSQL))
     df01 = spark.sql(VSQL).cache()
-    ts_step_count = datetime.now()
     vTotDf=df01.count()
-    te_step_count = datetime.now()
-    print(etq_info(msg_d_duracion_ejecucion('df01',vle_duracion(ts_step_count,te_step_count))))
     if df01.rdd.isEmpty():
         exit(etq_nodata(msg_e_df_nodata('df01')))
     else:
@@ -70,7 +63,6 @@ try:
             ts_step_tbl = datetime.now()
             print(etq_info(msg_i_insert_hive('otc_t_b2b_temp_parque')))
             df01.createOrReplaceTempView("otc_t_b2b_temp_parque")
-            #df01.repartition(1).write.mode('overwrite').saveAsTable('otc_t_b2b_temp_parque')
             df01.printSchema()
             print(etq_info(msg_t_total_registros_hive('otc_t_b2b_temp_parque',str(vTotDf))))
             te_step_tbl = datetime.now()
@@ -97,25 +89,22 @@ try:
     VSQL=insert_otc_t_b2b_parque_facturacion()
     print(etq_sql(VSQL))
     df02 = spark.sql(VSQL).cache()
-    ts_step_count = datetime.now()
     vTotDf=df02.count()
-    te_step_count = datetime.now()
-    print(etq_info(msg_d_duracion_ejecucion('df02',vle_duracion(ts_step_count,te_step_count))))
     if df02.rdd.isEmpty():
         exit(etq_nodata(msg_e_df_nodata('df02')))
     else:
         try:
             ts_step_tbl = datetime.now()
-            print(etq_info(msg_i_insert_hive('insert_otc_t_b2b_parque_facturacion')))
+            print(etq_info(msg_i_insert_hive(vSchmRep+"."+"otc_t_b2b_parque_facturacion")))
             columns = spark.table(vSchmRep+"."+"otc_t_b2b_parque_facturacion").columns
             cols = []
             for column in columns:
                 cols.append(column)
             df02 = df02.select(cols)
             df02.repartition(1).write.mode("append").insertInto(vSchmRep+"."+"otc_t_b2b_parque_facturacion")
-            print(etq_info("Insercion Ok de la tabla destino: "+"otc_t_b2b_parque_facturacion")) 
+            print(etq_info("Insercion Ok de la tabla destino: "+vSchmRep+"."+"otc_t_b2b_parque_facturacion")) 
             df02.printSchema()
-            print(etq_info(msg_t_total_registros_hive('insert_otc_t_b2b_parque_facturacion',str(vTotDf))))
+            print(etq_info(msg_t_total_registros_hive(vSchmRep+"."+"otc_t_b2b_parque_facturacion",str(vTotDf))))
             te_step_tbl = datetime.now()
             print(etq_info(msg_d_duracion_hive('insert_otc_t_b2b_parque_facturacion',vle_duracion(ts_step_tbl,te_step_tbl))))
             spark.catalog.dropTempView("otc_t_b2b_temp_parque")
@@ -145,12 +134,7 @@ try:
     VSQL=insert_01_otc_t_b2b_terminales_adendum(mesVeinteCuatro,FechaProceso)
     print(etq_sql(VSQL))
     df03 = spark.sql(VSQL).cache()
-    ts_step_count = datetime.now()
-    vTotDf=df03.count()
-    print(etq_info(msg_t_total_registros_hive('insert_01_otc_t_b2b_terminales_adendum',str(vTotDf))))
-    te_step_count = datetime.now()
-    print(etq_info(msg_d_duracion_ejecucion('df03',vle_duracion(ts_step_count,te_step_count))))
-    
+    df03.printSchema()
     del df03_01
     print(etq_info("Eliminar dataframe [{}]".format('df03_01')))
     te_step = datetime.now()
@@ -177,21 +161,21 @@ try:
     else:
         try:
             ts_step_tbl = datetime.now()
-            print(etq_info(msg_i_insert_hive('insert_02_otc_t_b2b_terminales_adendum')))
+            print(etq_info(msg_i_insert_hive(vSchmRep+"."+"otc_t_b2b_terminales_adendum")))
             columns = spark.table(vSchmRep+"."+"otc_t_b2b_terminales_adendum").columns
             cols = []
             for column in columns:
                 cols.append(column)
             df04 = df04.select(cols)
             df04.repartition(1).write.mode("append").insertInto(vSchmRep+"."+"otc_t_b2b_terminales_adendum")
-            print(etq_info("Insercion Ok de la tabla destino: "+"otc_t_b2b_terminales_adendum")) 
+            print(etq_info("Insercion Ok de la tabla destino: "+vSchmRep+"."+"otc_t_b2b_terminales_adendum")) 
             df04.printSchema()
-            print(etq_info(msg_t_total_registros_hive('insert_02_otc_t_b2b_terminales_adendum',str(vTotDf))))
+            print(etq_info(msg_t_total_registros_hive(vSchmRep+"."+"otc_t_b2b_terminales_adendum",str(vTotDf))))
             te_step_tbl = datetime.now()
-            print(etq_info(msg_d_duracion_hive('insert_02_otc_t_b2b_terminales_adendum',vle_duracion(ts_step_tbl,te_step_tbl))))
+            print(etq_info(msg_d_duracion_hive(vSchmRep+"."+"otc_t_b2b_terminales_adendum",vle_duracion(ts_step_tbl,te_step_tbl))))
             spark.catalog.dropTempView("otc_t_b2b_identificacion_cliente")
         except Exception as e:       
-            exit(etq_error(msg_e_insert_hive('insert_02_otc_t_b2b_terminales_adendum',str(e))))
+            exit(etq_error(msg_e_insert_hive(vSchmRep+"."+"otc_t_b2b_terminales_adendum",str(e))))
     del df03
     del df04
     print(etq_info("Eliminar dataframe [{}]".format('df04')))
@@ -212,7 +196,7 @@ try:
     df05.createOrReplaceTempView("otc_t_b2b_temp_notas_credito")
     print(etq_info(msg_t_total_registros_obtenidos("df05",str(df05.count())))) 
     te_step_tbl = datetime.now()
-    print(etq_info(msg_d_duracion_hive("df05",vle_duracion(ts_step_tbl,te_step_tbl))))
+    print(etq_info(msg_d_duracion_hive("otc_t_b2b_temp_notas_credito",vle_duracion(ts_step_tbl,te_step_tbl))))
     del df05
     
     vStp="Paso [06]: Ejecucion de funcion [otc_t_b2b_temp_factura_afectada]- EXTRAER LA FACTURA AFECTADA CON LA NOTA DE CREDITO"
@@ -225,7 +209,7 @@ try:
     df06.createOrReplaceTempView("otc_t_b2b_temp_factura_afectada")
     print(etq_info(msg_t_total_registros_obtenidos("df06",str(df06.count())))) 
     te_step_tbl = datetime.now()
-    print(etq_info(msg_d_duracion_hive("df06",vle_duracion(ts_step_tbl,te_step_tbl))))
+    print(etq_info(msg_d_duracion_hive("otc_t_b2b_temp_factura_afectada",vle_duracion(ts_step_tbl,te_step_tbl))))
     del df06
     
     vStp="Paso [07]: Ejecucion de funcion [otc_t_b2b_temp_ajustes_nota_credito]- EXTRAER AJUSTES EFECTUADOS A LA NOTA DE CREDITO"
@@ -238,7 +222,7 @@ try:
     df07.createOrReplaceTempView("otc_t_b2b_temp_ajustes_nota_credito")
     print(etq_info(msg_t_total_registros_obtenidos("df07",str(df07.count())))) 
     te_step_tbl = datetime.now()
-    print(etq_info(msg_d_duracion_hive("df07",vle_duracion(ts_step_tbl,te_step_tbl))))
+    print(etq_info(msg_d_duracion_hive("otc_t_b2b_temp_ajustes_nota_credito",vle_duracion(ts_step_tbl,te_step_tbl))))
     del df07
     spark.catalog.dropTempView("otc_t_b2b_temp_notas_credito")
     
@@ -252,7 +236,7 @@ try:
     df08.createOrReplaceTempView("otc_t_b2b_temp_disputa")
     print(etq_info(msg_t_total_registros_obtenidos("df08",str(df08.count())))) 
     te_step_tbl = datetime.now()
-    print(etq_info(msg_d_duracion_hive("df08",vle_duracion(ts_step_tbl,te_step_tbl))))
+    print(etq_info(msg_d_duracion_hive("otc_t_b2b_temp_disputa",vle_duracion(ts_step_tbl,te_step_tbl))))
     del df08
     spark.catalog.dropTempView("otc_t_b2b_temp_factura_afectada")
     spark.catalog.dropTempView("otc_t_b2b_temp_ajustes_nota_credito")
@@ -267,7 +251,7 @@ try:
     df09.createOrReplaceTempView("otc_t_b2b_cuentas")
     print(etq_info(msg_t_total_registros_obtenidos("df09",str(df09.count())))) 
     te_step_tbl = datetime.now()
-    print(etq_info(msg_d_duracion_hive("df09",vle_duracion(ts_step_tbl,te_step_tbl))))
+    print(etq_info(msg_d_duracion_hive("otc_t_b2b_cuentas",vle_duracion(ts_step_tbl,te_step_tbl))))
     del df09
     
     vStp="Paso [10]: Ejecucion de funcion [otc_t_b2b_disp]- Extrae informacion de disputa"
@@ -280,7 +264,7 @@ try:
     df10.createOrReplaceTempView("otc_t_b2b_disp")
     print(etq_info(msg_t_total_registros_obtenidos("df10",str(df10.count())))) 
     te_step_tbl = datetime.now()
-    print(etq_info(msg_d_duracion_hive("df10",vle_duracion(ts_step_tbl,te_step_tbl))))
+    print(etq_info(msg_d_duracion_hive("otc_t_b2b_disp",vle_duracion(ts_step_tbl,te_step_tbl))))
     del df10
     
     vStp="Paso [11]: Ejecucion de funcion [otc_t_b2b_facturacion_1]-Extraer facturacion de tres meses posteriores incluyendo mes actual y alimentar tabla de facturacion otc_t_b2b_facturacion"
@@ -292,7 +276,7 @@ try:
     ts_step_tbl = datetime.now()
     print(etq_info(msg_t_total_registros_obtenidos("df11",str(df11.count())))) 
     te_step_tbl = datetime.now()
-    print(etq_info(msg_d_duracion_hive("df11",vle_duracion(ts_step_tbl,te_step_tbl))))
+    print(etq_info(msg_d_duracion_hive("otc_t_b2b_facturacion_1",vle_duracion(ts_step_tbl,te_step_tbl))))
     
     vStp="Paso [12]: Ejecucion de funcion [otc_t_b2b_facturacion_2]-Extraer facturacion de tres meses posteriores incluyendo mes actual y alimentar tabla de facturacion otc_t_b2b_facturacion"
     print(lne_dvs())
@@ -303,7 +287,7 @@ try:
     ts_step_tbl = datetime.now()
     print(etq_info(msg_t_total_registros_obtenidos("df12",str(df12.count())))) 
     te_step_tbl = datetime.now()
-    print(etq_info(msg_d_duracion_hive("df12",vle_duracion(ts_step_tbl,te_step_tbl))))
+    print(etq_info(msg_d_duracion_hive("otc_t_b2b_facturacion_2",vle_duracion(ts_step_tbl,te_step_tbl))))
     spark.catalog.dropTempView("otc_t_b2b_cuentas")
     spark.catalog.dropTempView("otc_t_b2b_disp")
     
@@ -313,6 +297,7 @@ except Exception as e:
 vStp='[Paso final]:UNION ALL e INSERT en tabla final de los dataframes obtenidos en los PASOS [11] y [12] - Extraer facturacion de tres meses posteriores incluyendo mes actual y alimentar tabla de facturacion otc_t_b2b_facturacion'
 try:
     ts_step = datetime.now()
+    print(lne_dvs())
     print(etq_info(vStp))
     print(lne_dvs())
     print(etq_info("REALIZA EL TRUNCADO DE LA TABLA: "+vSchmRep+"."+"otc_t_b2b_facturacion"))
@@ -323,35 +308,33 @@ try:
     ts_step_count = datetime.now()
     vTotDf=dffinal.count()
     te_step_count = datetime.now()
-    print(etq_info(msg_d_duracion_ejecucion('dffinal',vle_duracion(ts_step_count,te_step_count))))
+    print(etq_info(msg_d_duracion_ejecucion("Union de df11 y df12",vle_duracion(ts_step_count,te_step_count))))
     if dffinal.rdd.isEmpty():
         exit(etq_nodata(msg_e_df_nodata('dffinal')))
     else:
         try:
             ts_step_tbl = datetime.now()
-            print(etq_info(msg_i_insert_hive('otc_t_b2b_facturacion')))
+            print(etq_info(msg_i_insert_hive(vSchmRep+"."+"otc_t_b2b_facturacion")))
             columns = spark.table(vSchmRep+"."+"otc_t_b2b_facturacion").columns
             cols = []
             for column in columns:
                 cols.append(column)
             dffinal = dffinal.select(cols)
-            dffinal.repartition(2).write.mode("append").insertInto(vSchmRep+"."+"otc_t_b2b_facturacion")
-            print(etq_info("Insercion Ok de la tabla destino: "+"otc_t_b2b_facturacion")) 
+            dffinal.repartition(1).write.mode("append").insertInto(vSchmRep+"."+"otc_t_b2b_facturacion")
+            print(etq_info("Insercion OK de la tabla destino: "+vSchmRep+"."+"otc_t_b2b_facturacion")) 
             dffinal.printSchema()
-            print(etq_info(msg_t_total_registros_hive('otc_t_b2b_facturacion',str(vTotDf))))
+            print(etq_info(msg_t_total_registros_hive(vSchmRep+"."+"otc_t_b2b_facturacion",str(vTotDf))))
             te_step_tbl = datetime.now()
-            print(etq_info(msg_d_duracion_hive('otc_t_b2b_facturacion',vle_duracion(ts_step_tbl,te_step_tbl))))
-            #spark.catalog.dropTempView("otc_t_b2b_temp_disputa")
+            print(etq_info(msg_d_duracion_hive(vSchmRep+"."+"otc_t_b2b_facturacion",vle_duracion(ts_step_tbl,te_step_tbl))))
+            spark.catalog.dropTempView("otc_t_b2b_temp_disputa")
         except Exception as e:       
-            exit(etq_error(msg_e_insert_hive('otc_t_b2b_facturacion',str(e))))
+            exit(etq_error(msg_e_insert_hive(vSchmRep+"."+"otc_t_b2b_facturacion",str(e))))
     del dffinal
     del df11
     del df12
     print(etq_info("Eliminar dataframe [{}]".format('dffinal')))
     te_step = datetime.now()
     print(etq_info(msg_d_duracion_ejecucion(vStp,vle_duracion(ts_step,te_step))))
-    #print('Total de registros insertados en la tabla:'+vSchmRep+"."+"otc_t_b2b_facturacion"+'WHERE fecha_proceso='+FechaProceso)
-    #print(spark.sql('Select count(1) from ' +vSchmRep+"."+"otc_t_b2b_facturacion"))
 except Exception as e:
     exit(etq_error(msg_e_ejecucion(vStp,str(e))))
 print(lne_dvs())
