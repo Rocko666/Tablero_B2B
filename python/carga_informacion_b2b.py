@@ -14,7 +14,7 @@ from functions import *
 from create import *
 
 timestart = datetime.now()
-## STEP 2: Captura de argumentos en la entrada
+## STEP 1: Captura de argumentos en la entrada
 parser = argparse.ArgumentParser()
 parser.add_argument('--vSchmRep', required=True, type=str,help='Esquema HIVE reportes')
 parser.add_argument('--FechaProceso', required=True, type=str,help='Fecha final mes anterior')
@@ -31,7 +31,17 @@ mesTresDate=parametros.mesTresDate
 mesVeinteCuatro=parametros.mesVeinteCuatro
 mesVeinteCuatroDate=parametros.mesVeinteCuatroDate
 
-## STEP 3: Inicio el SparkSession
+print(etq_info("Imprimiendo parametros para SPARK:"))
+print(lne_dvs())
+print(etq_info(log_p_parametros("Esquema HIVE reportes",str(vSchmRep))))
+print(etq_info(log_p_parametros("Fecha final mes anterior",str(FechaProceso))))
+print(etq_info(log_p_parametros("FECHA EJECUCION MENOS 3 MESES",str(mesTres))))
+print(etq_info(log_p_parametros("FECHA EJECUCION MENOS 3 MESES formato date",str(mesTresDate))))
+print(etq_info(log_p_parametros("FECHA EJECUCION MENOS 24 MESES",str(mesVeinteCuatro))))
+print(etq_info(log_p_parametros("FECHA EJECUCION MENOS 24 MESES formato date",str(mesVeinteCuatroDate))))
+print(lne_dvs())
+
+## STEP 2: Inicio el SparkSession
 spark = SparkSession. \
     builder. \
     config("hive.exec.dynamic.partition.mode", "nonstrict"). \
@@ -42,7 +52,7 @@ app_id = spark._sc.applicationId
 hive_hwc = HiveWarehouseSession.session(spark).build()
 print(etq_info("INFO: Mostrar application_id => {}".format(str(app_id))))
 
-##STEP 4:QUERYS
+##STEP 3:QUERYS
 print(lne_dvs())
 print(etq_info("INFO: Mostrar application_id => {}".format(str(app_id))))
 timestart_b = datetime.now()
@@ -106,10 +116,10 @@ try:
             df02.printSchema()
             print(etq_info(msg_t_total_registros_hive(vSchmRep+"."+"otc_t_b2b_parque_facturacion",str(vTotDf))))
             te_step_tbl = datetime.now()
-            print(etq_info(msg_d_duracion_hive('insert_otc_t_b2b_parque_facturacion',vle_duracion(ts_step_tbl,te_step_tbl))))
+            print(etq_info(msg_d_duracion_hive(vSchmRep+"."+"otc_t_b2b_parque_facturacion",vle_duracion(ts_step_tbl,te_step_tbl))))
             spark.catalog.dropTempView("otc_t_b2b_temp_parque")
         except Exception as e:       
-            exit(etq_error(msg_e_insert_hive('insert_otc_t_b2b_parque_facturacion',str(e))))
+            exit(etq_error(msg_e_insert_hive(vSchmRep+"."+"otc_t_b2b_parque_facturacion",str(e))))
     del df02
     print(etq_info("Eliminar dataframe [{}]".format('df02')))
     te_step = datetime.now()
@@ -135,6 +145,10 @@ try:
     print(etq_sql(VSQL))
     df03 = spark.sql(VSQL).cache()
     df03.printSchema()
+    vTotDf=df03_01.count()
+    print(etq_info(msg_t_total_registros_hive('otc_t_b2b_identificacion_cliente',str(vTotDf))))
+    vTotDf=df03.count()
+    print(etq_info(msg_t_total_registros_hive('insert_01_otc_t_b2b_terminales_adendum',str(vTotDf))))
     del df03_01
     print(etq_info("Eliminar dataframe [{}]".format('df03_01')))
     te_step = datetime.now()
@@ -151,6 +165,8 @@ try:
     VSQL=insert_02_otc_t_b2b_terminales_adendum(mesVeinteCuatro,FechaProceso)
     print(etq_sql(VSQL))
     df04 = spark.sql(VSQL).cache()
+    vTotDf=df04.count()
+    print(etq_info(msg_t_total_registros_hive('insert_02_otc_t_b2b_terminales_adendum',str(vTotDf))))
     df04 = df04.union(df03)
     ts_step_count = datetime.now()
     vTotDf=df04.count()
@@ -320,7 +336,7 @@ try:
             for column in columns:
                 cols.append(column)
             dffinal = dffinal.select(cols)
-            dffinal.repartition(1).write.mode("append").insertInto(vSchmRep+"."+"otc_t_b2b_facturacion")
+            dffinal.repartition(2).write.mode("append").insertInto(vSchmRep+"."+"otc_t_b2b_facturacion")
             print(etq_info("Insercion OK de la tabla destino: "+vSchmRep+"."+"otc_t_b2b_facturacion")) 
             dffinal.printSchema()
             print(etq_info(msg_t_total_registros_hive(vSchmRep+"."+"otc_t_b2b_facturacion",str(vTotDf))))

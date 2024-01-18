@@ -268,7 +268,7 @@ SELECT
 	, a.num_factura_afectada
 	, C.dispute_seq
 FROM
-	db_rbm.otc_t_ADJUSTMENT C
+	db_rbm.otc_t_adjustment C
 INNER JOIN otc_t_b2b_temp_notas_credito A ON
 	C.BILL_SEQ = A.bill_seg_nota_credito
 	AND C.ACCOUNT_NUM = A.cuenta_facturacion
